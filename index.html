@@ -783,17 +783,28 @@ details.box .fgrid{padding-bottom:14px}
       <p class="err-line" id="lgErr" role="alert"></p>
       <button class="btn pri" type="submit" style="width:100%;margin-top:6px" id="lgBtn">Entrar</button>
     </div>
+    <p id="gateVer" style="margin:14px 0 0;font-size:11px;color:var(--muted)"></p>
   </form>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
 /* ===================== CONFIGURAÇÃO DO SUPABASE =====================
    Cole aqui os 2 códigos do seu projeto (Supabase → Project Settings → API) */
-const SUPABASE_URL = 'COLE_AQUI_A_PROJECT_URL';
-const SUPABASE_KEY = 'COLE_AQUI_A_ANON_PUBLIC_KEY';
+const SUPABASE_URL = 'https://lhrmxphgjyimojslohgu.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_mgTjWnIWIYZuBf6ZXDi-gQ_rWyXC7Fg';
 /* ==================================================================== */
-const SB_OK = /^https:\/\/.+\.supabase\.co/.test(SUPABASE_URL) && SUPABASE_KEY.length > 30 && window.supabase;
-const SB = SB_OK ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+const VERSAO_AGENDA = '12/11 · v2';
+const SB_URL = SUPABASE_URL.trim().replace(/\/rest\/v1\/?$/,'').replace(/\/+$/,'');
+const CFG_OK = /^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(SB_URL) && SUPABASE_KEY.trim().length > 20 && !/COLE_AQUI/.test(SUPABASE_KEY);
+const SB_SRCS = ['https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.1/dist/umd/supabase.min.js','https://unpkg.com/@supabase/supabase-js@2.110.1/dist/umd/supabase.min.js','https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js'];
+let SB = null;
+const loadScript = src => new Promise((res, rej) => { const t = document.createElement('script'); t.src = src; t.onload = res; t.onerror = rej; document.head.appendChild(t); });
+async function loadSB(){
+  if(!CFG_OK) return 'config';
+  for(const src of SB_SRCS){ if(window.supabase) break; try{ await loadScript(src); }catch(e){} }
+  if(!window.supabase || !window.supabase.createClient) return 'lib';
+  try{ SB = window.supabase.createClient(SB_URL, SUPABASE_KEY.trim()); }catch(e){ return 'lib'; }
+  return 'ok';
+}
 /* camada que imita o banco usado na versão do Claude, gravando numa tabela "docs" do Supabase */
 const JRDB = (() => {
   const subs = new Set();
@@ -949,10 +960,14 @@ function zapLink(a, tpl){ const n = waNum(a.telefone); if(!n) return null; retur
   const note = $('#connNote');
   const timer = setTimeout(() => { if(!loaded){ note.textContent='Não consegui carregar a agenda ainda. Verifique a internet; os dados aparecem sozinhos quando a conexão voltar.'; note.classList.add('on'); } }, 10000);
   document.documentElement.classList.add('no-ai');
-  if(!SB){ clearTimeout(timer); loaded = true; $('#loginGate').hidden = false; $('#gateFields').hidden = true; $('#gateSub').innerHTML = 'Falta configurar o banco de dados.<br>Abra o arquivo index.html e cole a <b>Project URL</b> e a <b>anon key</b> do Supabase no topo do código.'; return; }
+  $('#gateVer').textContent = 'versão ' + VERSAO_AGENDA;
+  const st = await loadSB();
+  if(st !== 'ok'){ clearTimeout(timer); loaded = true; $('#loginGate').hidden = false; $('#gateFields').hidden = true;
+    $('#gateSub').innerHTML = st === 'config' ? 'Falta configurar o banco de dados.<br>No topo do arquivo index.html, confira a <b>Project URL</b> e a <b>chave publishable</b> do Supabase.' : 'Não consegui carregar o Supabase.<br>Verifique a internet e recarregue a página. Se continuar, me mande um print desta tela.';
+    return; }
   clearTimeout(timer);
   const sess = (await SB.auth.getSession()).data.session;
-  if(!sess){ $('#loginGate').hidden = false; await new Promise(res => { $('#loginForm').onsubmit = async e => { e.preventDefault(); $('#lgBtn').disabled = true; $('#lgErr').textContent = ''; const {error} = await SB.auth.signInWithPassword({email:$('#lgEmail').value.trim(), password:$('#lgPass').value}); $('#lgBtn').disabled = false; if(error){ $('#lgErr').textContent = 'E-mail ou senha incorretos.'; return; } $('#loginGate').hidden = true; res(); }; }); }
+  if(!sess){ $('#loginGate').hidden = false; await new Promise(res => { $('#loginForm').onsubmit = async e => { e.preventDefault(); $('#lgBtn').disabled = true; $('#lgErr').textContent = ''; let error; try{ ({error} = await SB.auth.signInWithPassword({email:$('#lgEmail').value.trim(), password:$('#lgPass').value})); }catch(e){ error = e; } $('#lgBtn').disabled = false; if(error){ const m = String(error.message||''); $('#lgErr').textContent = /invalid login|credentials/i.test(m) ? 'E-mail ou senha incorretos.' : /confirm/i.test(m) ? 'Confirme o e-mail do usuário no Supabase (Authentication → Users).' : 'Não consegui entrar: ' + m; return; } $('#loginGate').hidden = true; res(); }; }); }
   DB = JRDB;
   const fail = err => { clearTimeout(timer); loaded = true; note.textContent='Parte dos dados não pôde ser carregada agora ('+(err&&err.code)+'). Recarregue mais tarde.'; note.classList.add('on'); };
   DB.collection('agendamentos').orderBy('data','desc').limit(1000).onSnapshot(snap => {

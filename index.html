@@ -40,6 +40,7 @@ header.top::after{content:"";position:absolute;left:16px;right:16px;bottom:30px;
 .brand h1{font-family:var(--display);font-weight:400;font-size:20px;margin:0;line-height:1.1}
 .brand small{display:block;font-size:10.5px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-top:4px;font-weight:300}
 .brand .sp{flex:1}
+.icon-btn.unlocked{background:var(--gold);color:var(--green);border-color:var(--gold)}
 .icon-btn{white-space:nowrap;flex:none;background:transparent;border:1px solid rgba(236,214,170,.45);color:var(--off);border-radius:999px;height:36px;padding:0 14px;font-size:13px;font-weight:300}
 .datebar{display:flex;align-items:center;gap:8px}
 .datebar .lbl{flex:1;min-width:0}
@@ -376,6 +377,7 @@ details.box .fgrid{padding-bottom:14px}
       <img src="mono-jr.png" alt="" class="logo-mono" width="44" height="48">
       <div><h1>João Ramos</h1><small>Studio Estético · Cuiabá</small></div>
       <div class="sp"></div>
+      <button class="icon-btn" id="lockBtn" type="button" aria-label="Área protegida" title="Área protegida"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="11" width="14" height="9" rx="2"/><path id="lockShackle" d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></button>
       <button class="icon-btn" id="helpBtn" type="button">Como usar</button>
     </div>
     <div class="datebar" id="datebar">
@@ -494,6 +496,16 @@ details.box .fgrid{padding-bottom:14px}
       <div class="f full"><label for="cfgSinal">Sinal padrão (% do valor)</label><input id="cfgSinal" type="number" min="0" max="100" step="5" inputmode="numeric"></div>
       <div class="f full"><label for="cfgMeuZap">Meu WhatsApp para lembretes</label><input id="cfgMeuZap" type="tel" inputmode="tel" placeholder="(65) 9 9999-9999"></div>
       <div class="f full"><label for="cfgMeta">Meta de faturamento do mês (R$)</label><input id="cfgMeta" type="number" min="0" step="100" inputmode="decimal" placeholder="Ex.: 15000"></div>
+    </div>
+    <div class="sec-h"><h2>Segurança</h2><small>senha de administrador</small></div>
+    <div class="card fgrid" id="secCard">
+      <p class="sub" style="grid-column:1/-1;margin:0">A senha protege a ficha das clientes, a anamnese, o registro clínico e estes Ajustes. Ela é a mesma em todos os aparelhos, e a área bloqueia sozinha depois de 15 minutos sem uso.</p>
+      <div class="f full"><label for="scCur">Senha atual</label><input id="scCur" type="password" autocomplete="current-password" autocapitalize="off"></div>
+      <div class="f"><label for="scNew">Nova senha</label><input id="scNew" type="password" autocomplete="new-password" autocapitalize="off"></div>
+      <div class="f"><label for="scNew2">Repita a nova senha</label><input id="scNew2" type="password" autocomplete="new-password" autocapitalize="off"></div>
+      <div class="row2" style="grid-column:1/-1"><button class="btn pri sm" type="button" id="scChange">Alterar senha</button><button class="btn ghost sm" type="button" id="scRecNew">Novo código de recuperação</button><button class="btn ghost sm" type="button" id="scLockNow">Bloquear agora</button></div>
+      <div id="scRecBox" style="grid-column:1/-1"></div>
+      <p class="sub" style="grid-column:1/-1;margin:0">E-mail de recuperação: <b>esteticaavancadadrjoaoramos@gmail.com</b></p>
     </div>
     <div class="sec-h"><h2>Mensagens</h2><small>use {nome}, {procedimento}, {dia} e {hora}</small></div>
     <div class="card fgrid">
@@ -701,6 +713,27 @@ details.box .fgrid{padding-bottom:14px}
   </form>
 </div>
 
+<!-- Folha: senha -->
+<div class="sheet-bg" id="lockSheet" role="dialog" aria-modal="true" aria-labelledby="lkTitle">
+  <form class="sheet" id="lockForm" style="max-width:420px">
+    <div class="grab"></div>
+    <div style="text-align:center"><img src="mono-jr.png" alt="" style="height:52px;width:auto;display:block;margin:0 auto 8px"><h3 id="lkTitle">Área <span class="hl">protegida</span></h3><p class="sub" id="lkSub">Digite a senha de administrador.</p></div>
+    <div id="lkMain">
+      <div class="f"><label for="lkPass">Senha</label><input id="lkPass" type="password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+      <p class="sub" id="lkErr" style="color:var(--bad);margin:8px 0 0;min-height:1em" role="alert"></p>
+      <div class="acts"><button class="btn ghost sm" type="button" id="lkForgot">Esqueci a senha</button><span class="sp"></span><button class="btn ghost" type="button" data-close>Cancelar</button><button class="btn pri" type="submit">Entrar</button></div>
+    </div>
+    <div id="lkRec" hidden>
+      <p class="sub" style="text-align:left">Use o <b>código de recuperação</b> que está no seu Gmail (esteticaavancadadrjoaoramos@gmail.com), no e-mail “Código de recuperação – Agenda JR Studio”.</p>
+      <div class="f"><label for="rcCode">Código de recuperação</label><input id="rcCode" autocapitalize="characters" autocorrect="off" spellcheck="false" placeholder="XXXX-XXXX-XX"></div>
+      <div class="f" style="margin-top:10px"><label for="rcNew">Nova senha</label><input id="rcNew" type="password" autocomplete="new-password" autocapitalize="off"></div>
+      <div class="f" style="margin-top:10px"><label for="rcNew2">Repita a nova senha</label><input id="rcNew2" type="password" autocomplete="new-password" autocapitalize="off"></div>
+      <p class="sub" id="rcErr" style="color:var(--bad);margin:8px 0 0;min-height:1em" role="alert"></p>
+      <div class="acts"><button class="btn ghost" type="button" id="rcBack">Voltar</button><span class="sp"></span><button class="btn pri" type="button" id="rcGo">Criar nova senha</button></div>
+    </div>
+  </form>
+</div>
+
 <!-- Folha: opções de anamnese -->
 <div class="sheet-bg" id="anChooseSheet" role="dialog" aria-modal="true" aria-labelledby="anChTitle">
   <div class="sheet"><div class="grab"></div><h3 id="anChTitle">Anamnese</h3><p class="sub" id="anChSub"></p>
@@ -760,6 +793,7 @@ details.box .fgrid{padding-bottom:14px}
       <li><b>Pedidos online:</b> quando chegar um pedido da sua página de agendamento, abra “Pedidos”, toque em “Colar pedido”, depois aprove ou recuse.</li>
       <li><b>Resumo do dia:</b> ao abrir a agenda, aparece quem você atende hoje, quem falta confirmar, anamneses e sinais pendentes e quanto entrou ontem. Na sexta e no sábado aparece também o resumo da semana.</li>
       <li><b>IA em qualquer tela:</b> toque no botão redondo “IA”, acima do “Novo agendamento”. Você pode mandar o print de uma conversa do WhatsApp (botão da imagem) e ele cria o agendamento sozinho, ou pedir “manda o link da anamnese para quem não respondeu”.</li>
+      <li><b>Senha de administrador:</b> a ficha das clientes, a anamnese, o registro clínico e os Ajustes pedem senha. Depois de digitar, fica liberado por 15 minutos naquele aparelho. O cadeado no topo mostra se está aberto e bloqueia na hora. Esqueceu? Toque em “Esqueci a senha” e use o código de recuperação guardado no seu Gmail.</li>
       <li><b>Lembretes no seu WhatsApp:</b> no resumo do dia, toque em “Agenda de amanhã no meu WhatsApp”. Abre a conversa com você mesmo com a lista dos horários, alertas, sinais e anamneses pendentes. É só enviar e ela fica guardada no seu WhatsApp.</li>
       <li><b>Anamnese ligada à agenda:</b> ao enviar o link, a ficha da cliente marca “aguardando”. Quando ela responder, cole a mensagem em “Colar respostas”, em “Pedidos → Colar pedido” ou no assistente, e a ficha é preenchida sozinha.</li>
       <li><b>Cuidados pós:</b> ao salvar o registro clínico, a mensagem de cuidados daquele procedimento já aparece pronta para enviar no WhatsApp.</li>
@@ -792,7 +826,7 @@ details.box .fgrid{padding-bottom:14px}
 const SUPABASE_URL = 'https://lhrmxphgjyimojslohgu.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_mgTjWnIWIYZuBf6ZXDi-gQ_rWyXC7Fg';
 /* ==================================================================== */
-const VERSAO_AGENDA = '12/11 · v2';
+const VERSAO_AGENDA = '13/11 · v3';
 const SB_URL = SUPABASE_URL.trim().replace(/\/rest\/v1\/?$/,'').replace(/\/+$/,'');
 const CFG_OK = /^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(SB_URL) && SUPABASE_KEY.trim().length > 20 && !/COLE_AQUI/.test(SUPABASE_KEY);
 const SB_SRCS = ['https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.1/dist/umd/supabase.min.js','https://unpkg.com/@supabase/supabase-js@2.110.1/dist/umd/supabase.min.js','https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js'];
@@ -978,6 +1012,7 @@ function zapLink(a, tpl){ const n = waNum(a.telefone); if(!n) return null; retur
   DB.collection('clientes').limit(1000).onSnapshot(snap => { FICHAS = {}; snap.docs.forEach(d => FICHAS[d.id] = {id:d.id, ...d.data()}); renderAll(); refreshOpen(); }, fail);
   DB.collection('pacotes').limit(500).onSnapshot(snap => { PAC = snap.docs.map(d => ({id:d.id, ...d.data()})); renderAll(); refreshOpen(); }, fail);
   DB.collection('despesas').orderBy('data','desc').limit(1000).onSnapshot(snap => { DESP = snap.docs.map(d => ({id:d.id, ...d.data()})); renderResumo(); }, fail);
+  DB.doc('seguranca/admin').onSnapshot(s => { SEC.doc = s.exists ? s.data() : null; SEC.loaded = true; }, () => { SEC.loaded = true; });
   DB.doc('config/studio').onSnapshot(s => {
     if(s.exists){ const d = s.data(); CFG = {...structuredClone(DEFAULT_CFG), ...d, procedimentos: (d.procedimentos && d.procedimentos.length) ? d.procedimentos : structuredClone(DEFAULT_CFG.procedimentos)}; }
     renderAll(); renderCfg();
@@ -996,7 +1031,7 @@ async function put(col, id, data){
     const ref = DB.collection(col).doc(); await ref.set({...data, criadoEm:new Date().toISOString()}); return ref.id;
   }catch(e){ writeErr(e); return null; }
 }
-async function setDoc(path, data){ if(!DB){ toast('Entre com a sua conta para salvar.'); return false; } try{ await DB.doc(path).set(data); return true; }catch(e){ writeErr(e); return false; } }
+async function setDoc(path, data){ if(!DB){ toast('Abra pelo seu link do Claude para salvar.'); return false; } try{ await DB.doc(path).set(data); return true; }catch(e){ writeErr(e); return false; } }
 async function delDoc(path){ if(!DB) return false; try{ await DB.doc(path).delete(); return true; }catch(e){ writeErr(e); return false; } }
 const saveAppt = (id, data) => put('agendamentos', id, data);
 
@@ -1275,7 +1310,8 @@ function renderClientes(){
 /* ================= ficha ================= */
 let fichaKey = null, fichaNome = '', FOTOS = [], fotosUnsub = null, phSel = [];
 function unsubFotos(){ if(fotosUnsub){ fotosUnsub(); fotosUnsub = null; } FOTOS = []; phSel = []; }
-function openFicha(nome, tab){
+function openFicha(nome, tab){ return requireUnlock(() => _openFicha(nome, tab)); }
+function _openFicha(nome, tab){
   nome = String(nome||'').trim(); if(!nome) return;
   fichaKey = keyOf(nome); fichaNome = nome;
   const f = FICHAS[fichaKey] || {}; const c = clients().find(x=>x.key===fichaKey) || {};
@@ -1380,7 +1416,7 @@ async function compress(file){
 }
 $('#phFile').addEventListener('change', async e => {
   const file = e.target.files[0]; e.target.value = ''; if(!file) return;
-  if(!DB){ toast('Entre com a sua conta para salvar fotos.'); return; }
+  if(!DB){ toast('Abra pelo seu link do Claude para salvar fotos.'); return; }
   toast('Preparando a foto…');
   try{
     const img = await compress(file); if(!img){ toast('Foto grande demais. Tente outra.'); return; }
@@ -1589,7 +1625,8 @@ function fieldHtml(f, v, pre){
     : `<input id="${id}" data-ck="${f.k}" type="${f.t||'text'}" ${f.t==='number'?'inputmode="decimal" step="any"':''} value="${esc(val)}" placeholder="${esc(f.ph||'')}">`;
   return `<div class="f${f.full?' full':''}"><label for="${id}">${esc(f.l)}</label>${inp}</div>`;
 }
-function openClin(id, afterDone){
+function openClin(id, afterDone){ return requireUnlock(() => _openClin(id, afterDone)); }
+function _openClin(id, afterDone){
   const a = AG.find(x=>x.id===id); if(!a) return; clinId = id;
   const tipo = tipoOf(a.procedimento), T = TEMPL[tipo], c = a.clinico || {}, campos = c.campos || {produto:c.produto, lote:c.lote, qtd:c.qtd, regiao:c.regiao}, reg = c.regioes || {};
   $('#clSub').textContent = `${a.cliente} · ${a.procedimento} · ${brDate(a.data)} às ${a.hora}` + (afterDone ? ' · atendimento concluído' : '');
@@ -1645,7 +1682,8 @@ function clinSummary(a){
 
 /* ================= anamnese ================= */
 let anKey = null, anNome = '', anMode = 'pro';
-function openAnam(nome, mode){
+function openAnam(nome, mode){ return requireUnlock(() => _openAnam(nome, mode)); }
+function _openAnam(nome, mode){
   nome = String(nome||'').trim(); if(!nome) return;
   anKey = keyOf(nome); anNome = (FICHAS[anKey]?.nome) || nome; anMode = mode === 'cliente' ? 'cliente' : 'pro';
   const an = anamOf(FICHAS[anKey]), q = an.q || {};
@@ -1849,8 +1887,8 @@ function switchTab(name){
   window.scrollTo({top:0});
   try{ window.history.replaceState(null,'', isA ? location.pathname : '#'+name); }catch(e){}
 }
-$$('nav.tabs button').forEach(b => b.onclick = () => switchTab(b.dataset.tab));
-{ const h = (location.hash||'').slice(1); if(['resumo','clientes','ia','ajustes'].includes(h)) switchTab(h); }
+$$('nav.tabs button').forEach(b => b.onclick = () => b.dataset.tab === 'ajustes' ? requireUnlock(() => switchTab('ajustes')) : switchTab(b.dataset.tab));
+{ const h = (location.hash||'').slice(1); if(['resumo','clientes','ia'].includes(h)) switchTab(h); }
 
 function renderAll(){ renderHeader(); renderKpis(); renderTodo(); renderBrief(); renderList(); renderResumo(); renderClientes(); }
 function refreshOpen(){ if(listMode) renderListSheet(); if(fichaKey && $('#fichaSheet').classList.contains('on')) renderFichaDyn(); }
@@ -1912,11 +1950,11 @@ const TOOLS = [
   {name:'resumo_caixa', description:'Resumo financeiro entre duas datas inclusivas (AAAA-MM-DD): entradas, saídas (despesas), lucro, a receber, realizados, faltas, por procedimento, por forma, e a meta do mês.', inputSchema:{type:'object',properties:{inicio:{type:'string'},fim:{type:'string'}},required:['inicio','fim']},
    execute:({inicio, fim}) => { const s = stats(inicio, fim); const dd = {}; s.D.forEach(d => dd[d.categoria] = (dd[d.categoria]||0)+(+d.valor||0)); return {inicio, fim, entradas:s.ent, saidas:s.sai, lucro:s.lucro, a_receber:s.aReceber, realizados:s.realizados, faltas:s.faltas, ticket_medio:Math.round(s.ticket*100)/100, por_procedimento:s.byProc, por_forma:s.byPay, despesas_por_categoria:dd, meta_mensal:CFG.meta||null}; }},
   {name:'abrir_ficha', description:'Dados completos de uma cliente pelo nome (parcial): ficha, anamnese, alertas, termo, histórico com registro clínico, pacotes, faltas e manutenções previstas.', inputSchema:{type:'object',properties:{nome:{type:'string'}},required:['nome']},
-   execute:({nome}) => { const L = findFicha(nome); if(!L.length) return {encontradas:0}; if(L.length>1 && !L.some(c=>norm(c.nome)===norm(nome))) return {varias:L.map(c=>c.nome)}; const c = L.find(c=>norm(c.nome)===norm(nome)) || L[0]; const f = FICHAS[c.key] || {};
+   execute:({nome}) => { if(!isUnlocked()) return {bloqueado:true, motivo:'A ficha está protegida por senha. Peça ao João para tocar no cadeado e digitar a senha antes.'}; const L = findFicha(nome); if(!L.length) return {encontradas:0}; if(L.length>1 && !L.some(c=>norm(c.nome)===norm(nome))) return {varias:L.map(c=>c.nome)}; const c = L.find(c=>norm(c.nome)===norm(nome)) || L[0]; const f = FICHAS[c.key] || {};
      return {nome:c.nome, telefone:c.telefone, nascimento:f.nascimento||null, anamnese:f.anamnese||null, alerta:alertOf(c.nome), termo:f.termo?{aceito:true, data:f.termo.data, usoImagem:f.termo.usoImagem}:{aceito:false}, visitas:c.visitas, faltas:c.faltas, total_gasto:c.total,
        historico: AG.filter(a=>keyOf(a.cliente)===c.key).sort((a,b)=>b.data.localeCompare(a.data)).slice(0,15).map(a=>({...brief(a), clinico:a.clinico||null})), pacotes: PAC.filter(p=>keyOf(p.cliente)===c.key).map(p=>({id:p.id, procedimento:p.procedimento, sessoes:p.sessoes, valor:p.valor, ...pacInfo(p)})), manutencoes: manutencoes(c.key)}; }},
   {name:'mostrar_ficha_na_tela', description:'Abre a ficha da cliente na tela do João. Use quando ele pedir para abrir/ver a ficha.', inputSchema:{type:'object',properties:{nome:{type:'string'},aba:{type:'string',description:'dados|anam|hist|fotos|pac|termo'}},required:['nome']},
-   execute:({nome, aba}) => { const L = findFicha(nome); const c = L.find(c=>norm(c.nome)===norm(nome)) || L[0]; if(!c) return {ok:false, motivo:'cliente não encontrada'}; openFicha(c.nome, aba); return {ok:true, nome:c.nome}; }},
+   execute:({nome, aba}) => { if(!isUnlocked()){ requireUnlock(() => { const c = findFicha(nome)[0]; if(c) _openFicha(c.nome, aba); }); return {ok:false, motivo:'Pedi a senha na tela; a ficha abre assim que o João digitar.'}; } const L = findFicha(nome); const c = L.find(c=>norm(c.nome)===norm(nome)) || L[0]; if(!c) return {ok:false, motivo:'cliente não encontrada'}; openFicha(c.nome, aba); return {ok:true, nome:c.nome}; }},
   {name:'retornos', description:'Clientes no prazo de manutenção sem horário marcado. dias = quantos dias à frente olhar (padrão 7). Inclui link de WhatsApp com a mensagem de retorno.', inputSchema:{type:'object',properties:{dias:{type:'number'}}},
    execute:({dias}) => { const lim = addDays(todayStr(), dias ?? 7), min = addDays(todayStr(), -60); return {retornos: retornosAll().filter(r=>r.previsto<=lim && r.previsto>=min).map(r=>({...r, link: r.telefone ? zapLink({...r, data:''}, CFG.zapRet) : null}))}; }},
   {name:'confirmacoes_amanha', description:'Clientes de amanhã com link de WhatsApp da mensagem de confirmação.', inputSchema:{type:'object',properties:{}},
@@ -1997,6 +2035,71 @@ async function askAI(text){
 $('#composer').addEventListener('submit', e => { if(!$('#ask').value.trim() && pendingImg){ e.preventDefault(); askAI(''); return; } e.preventDefault(); const v = $('#ask').value; $('#ask').value=''; askAI(v); });
 $('#ask').addEventListener('keydown', e => { if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); $('#composer').requestSubmit(); } });
 $('#sugs').addEventListener('click', e => { const b = e.target.closest('.sug'); if(b) askAI(b.textContent); });
+
+/* ===== senha de administrador ===== */
+const SEC = {doc:null, loaded:false, until:0, pending:null};
+/* senha inicial "facial padrão" (troque em Ajustes → Segurança) */
+const SEC_INIT = {"salt": "C8atR0y+qUvMZI/4QSW8eQ==", "iter": 150000, "hash": "F+tPnC5lKSl5wC927/ICUVeqq0rcqJgnvUi8XtZHs1Y=", "recSalt": "glyafFtTKuv99DnO53PxvA==", "recHash": "xafT1GXP+Q3XnBwSBO5vsnyPUDVt0W53Ms+38BidlKU=", "email": "esteticaavancadadrjoaoramos@gmail.com", "atualizadoEm": "2026-11-14T01:10:00.000Z"};
+const SEC_EMAIL = 'esteticaavancadadrjoaoramos@gmail.com', SEC_MIN = 15;
+const b64e = u => btoa(String.fromCharCode(...u)), b64d = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const normPass = p => String(p||'').normalize('NFC').trim();
+const normCode = c => String(c||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+async function pbkdf2(text, saltB64, iter){ const k = await crypto.subtle.importKey('raw', new TextEncoder().encode(text), 'PBKDF2', false, ['deriveBits']); const bits = await crypto.subtle.deriveBits({name:'PBKDF2', salt:b64d(saltB64), iterations:iter, hash:'SHA-256'}, k, 256); return b64e(new Uint8Array(bits)); }
+const newSalt = () => b64e(crypto.getRandomValues(new Uint8Array(16)));
+function newCode(){ const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', r = crypto.getRandomValues(new Uint8Array(10)); const c = [...r].map(x => A[x % A.length]).join(''); return c.slice(0,4)+'-'+c.slice(4,8)+'-'+c.slice(8); }
+try{ SEC.until = +sessionStorage.getItem('jrUnlock') || 0; }catch(e){}
+function isUnlocked(){ return Date.now() < SEC.until; }
+function touchUnlock(){ if(isUnlocked()){ SEC.until = Date.now() + SEC_MIN*60000; try{ sessionStorage.setItem('jrUnlock', SEC.until); }catch(e){} } }
+function setLocked(v){ SEC.until = v ? 0 : Date.now() + SEC_MIN*60000; try{ sessionStorage.setItem('jrUnlock', SEC.until); }catch(e){} updLockBtn(); }
+function updLockBtn(){ const u = isUnlocked(); $('#lockBtn').classList.toggle('unlocked', u); $('#lockShackle').setAttribute('d', u ? 'M8 11V8a4 4 0 0 1 7.5-2' : 'M8 11V8a4 4 0 0 1 8 0v3'); $('#lockBtn').title = u ? 'Área desbloqueada · toque para bloquear' : 'Área protegida'; }
+['click','keydown','touchstart'].forEach(ev => document.addEventListener(ev, touchUnlock, {passive:true}));
+setInterval(() => { if(!isUnlocked() && $('#lockBtn').classList.contains('unlocked')){ updLockBtn(); ['fichaSheet','anamSheet','clinSheet'].forEach(id => { if($('#'+id).classList.contains('on')) closeSheet(id); }); if($('#v-ajustes').classList.contains('on')) switchTab('agenda'); toast('Área protegida bloqueada por inatividade'); } }, 20000);
+function requireUnlock(cb){
+  if(isUnlocked()){ touchUnlock(); cb(); return; }
+  if(!DB){ cb(); return; }
+  if(!SEC.loaded){ toast('Carregando a segurança, tente de novo em instantes.'); return; }
+  if(!SEC.doc){ setDoc('seguranca/admin', SEC_INIT).then(ok => { if(ok){ SEC.doc = {...SEC_INIT}; requireUnlock(cb); } }); return; }
+  SEC.pending = cb; showLock(false); openSheet('lockSheet'); setTimeout(() => $('#lkPass').focus(), 80);
+}
+function showLock(rec){ $('#lkMain').hidden = rec; $('#lkRec').hidden = !rec; $('#lkSub').textContent = rec ? 'Crie uma nova senha com o seu código de recuperação.' : 'Digite a senha de administrador.'; $('#lkErr').textContent = ''; $('#rcErr').textContent = ''; }
+async function checkPass(p){ if(!SEC.doc) return false; return (await pbkdf2(normPass(p), SEC.doc.salt, SEC.doc.iter || 150000)) === SEC.doc.hash; }
+$('#lockForm').addEventListener('submit', async e => {
+  e.preventDefault(); if(!$('#lkMain').hidden){
+    const ok = await checkPass($('#lkPass').value); $('#lkPass').value = '';
+    if(!ok){ $('#lkErr').textContent = 'Senha incorreta.'; return; }
+    setLocked(false); closeSheet('lockSheet'); const cb = SEC.pending; SEC.pending = null; if(cb) cb();
+  }
+});
+$('#lockSheet').addEventListener('click', e => { if(e.target.closest('[data-close]') || e.target.id === 'lockSheet') SEC.pending = null; });
+$('#lkForgot').onclick = () => showLock(true);
+$('#rcBack').onclick = () => showLock(false);
+async function saveSec(fields){ const cur = SEC.doc || {}; const data = {...cur, ...fields, email:SEC_EMAIL, atualizadoEm:new Date().toISOString()}; if(await setDoc('seguranca/admin', data)){ SEC.doc = data; return true; } return false; }
+async function setPassword(p){ const salt = newSalt(); return saveSec({salt, iter:150000, hash: await pbkdf2(normPass(p), salt, 150000)}); }
+function passProblem(a, b){ if(normPass(a).length < 6) return 'A senha precisa ter pelo menos 6 caracteres.'; if(normPass(a) !== normPass(b)) return 'As duas senhas não são iguais.'; return ''; }
+$('#rcGo').onclick = async () => {
+  const err = $('#rcErr'); const code = normCode($('#rcCode').value);
+  if(!SEC.doc || !SEC.doc.recHash){ err.textContent = 'Nenhum código de recuperação foi criado ainda.'; return; }
+  if(!code || (await pbkdf2(code, SEC.doc.recSalt, 150000)) !== SEC.doc.recHash){ err.textContent = 'Código de recuperação incorreto.'; return; }
+  const pr = passProblem($('#rcNew').value, $('#rcNew2').value); if(pr){ err.textContent = pr; return; }
+  if(await setPassword($('#rcNew').value)){ ['rcCode','rcNew','rcNew2'].forEach(id => $('#'+id).value=''); setLocked(false); closeSheet('lockSheet'); toast('Nova senha criada. Gere um novo código de recuperação em Ajustes.'); const cb = SEC.pending; SEC.pending = null; if(cb) cb(); }
+};
+$('#scChange').onclick = async () => {
+  if(!(await checkPass($('#scCur').value))){ toast('A senha atual não confere.'); return; }
+  const pr = passProblem($('#scNew').value, $('#scNew2').value); if(pr){ toast(pr); return; }
+  if(await setPassword($('#scNew').value)){ ['scCur','scNew','scNew2'].forEach(id => $('#'+id).value=''); toast('Senha alterada em todos os aparelhos'); }
+};
+$('#scRecNew').onclick = async () => {
+  const code = newCode(), recSalt = newSalt();
+  if(!(await saveSec({recSalt, recHash: await pbkdf2(normCode(code), recSalt, 150000), recEm:new Date().toISOString()}))) return;
+  const body = `Código de recuperação da Agenda JR Studio:\n\n${code}\n\nUse em “Esqueci a senha” para criar uma nova senha. Guarde este e-mail e não compartilhe o código.`;
+  const mail = `mailto:${SEC_EMAIL}?subject=${encodeURIComponent('Código de recuperação – Agenda JR Studio')}&body=${encodeURIComponent(body)}`;
+  const gm = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(SEC_EMAIL)}&su=${encodeURIComponent('Código de recuperação – Agenda JR Studio')}&body=${encodeURIComponent(body)}`;
+  $('#scRecBox').innerHTML = `<div class="info-line" style="margin:0"><b>Novo código: <span class="num" style="letter-spacing:1px">${code}</span></b><br>O código antigo deixou de valer. Envie este para o seu Gmail para guardar:<div class="row2" style="margin-top:8px"><a class="btn pri sm" href="${gm}" target="_blank" rel="noopener">Enviar pelo Gmail</a><a class="btn ghost sm" href="${mail}">Abrir no app de e-mail</a><button class="btn ghost sm" type="button" id="scCopy">Copiar código</button></div></div>`;
+  $('#scCopy').onclick = async () => { try{ await navigator.clipboard.writeText(code); toast('Código copiado'); }catch(e){ toast('Não consegui copiar. Anote o código.'); } };
+};
+$('#scLockNow').onclick = () => { setLocked(true); switchTab('agenda'); toast('Área protegida bloqueada'); };
+$('#lockBtn').onclick = () => { if(isUnlocked()){ setLocked(true); ['fichaSheet','anamSheet','clinSheet'].forEach(id => { if($('#'+id).classList.contains('on')) closeSheet(id); }); if($('#v-ajustes').classList.contains('on')) switchTab('agenda'); toast('Área protegida bloqueada'); } else requireUnlock(() => toast('Área desbloqueada por 15 minutos')); };
+updLockBtn();
 
 /* ===== agente em qualquer tela ===== */
 function openAgent(q){ $('#agentHost').appendChild($('#chatWrap')); openSheet('agentSheet'); setTimeout(() => { const c = $('#chat'); if(c.lastElementChild) c.lastElementChild.scrollIntoView({block:'end'}); if(q) askAI(q); }, 120); }
